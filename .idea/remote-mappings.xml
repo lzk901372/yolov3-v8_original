@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteMappingsManager">
+    <list>
+      <list>
+        <remote-mappings server-id="python@sftp://hdc@10.170.48.76:7788/home/hdc/anaconda3/envs/pytorch1.6/bin/python3.8">
+          <settings>
+            <list>
+              <mapping local-root="$PROJECT_DIR$/yolov3-8" remote-root="/media/hdc/data3/lzk_ur_main/20201125_ODexps/yolov3_v8_original/yolov3-8" />
+            </list>
+          </settings>
+        </remote-mappings>
+      </list>
+    </list>
+  </component>
+</project>

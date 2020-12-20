@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="c9d282f7-993c-4f3b-bc77-fbff6fc689d7" name="yolov3_v8_original" url="http:///">
+        <fileTransfer accessType="SFTP" host="10.170.48.76" port="7788" sshConfigId="5a9e51ec-d157-4989-b3f6-a8120a707ba1" sshConfig="hdc">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
