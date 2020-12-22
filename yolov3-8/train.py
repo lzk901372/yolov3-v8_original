@@ -30,7 +30,7 @@ hyp = {'giou': 3.54,  # giou loss gain
        'obj_pw': 1.0,  # obj BCELoss positive_weight
        'iou_t': 0.50,  # iou training threshold
        'lr0': 0.01,  # initial learning rate (SGD=5E-3, Adam=5E-4)
-       'lrf': 0.000005,  # final learning rate (with cos scheduler)
+       'lrf': 0.00005,  # final learning rate (with cos scheduler)
        'momentum': 0.937,  # SGD momentum
        'weight_decay': 0.0005,  # optimizer weight decay
        'fl_gamma': 1.0,  # focal loss gamma (efficientDet default is gamma=1.5)
@@ -247,7 +247,7 @@ def train(hyp):
             dataset.indices = random.choices(range(dataset.n), weights=image_weights, k=dataset.n)  # rand weighted idx
 
         mloss = torch.zeros(4).to(device)  # mean losses
-        print(('\n' + '%10s' * 8) % ('Epoch', 'gpu_mem', 'GIoU', 'obj', 'cls', 'total', 'targets', 'img_size'))
+        print(('\n' + '%15s' * 8) % ('Epoch', 'gpu_mem', 'GIoU', 'obj', 'cls', 'total', 'targets', 'img_size'))
         pbar = tqdm(enumerate(dataloader), total=nb)  # progress bar
         for i, (imgs, targets, paths, _) in pbar:  # batch -------------------------------------------------------------
             ni = i + nb * epoch  # number integrated batches (since train start)
@@ -301,7 +301,7 @@ def train(hyp):
             # Print
             mloss = (mloss * i + loss_items) / (i + 1)  # update mean losses
             mem = '%.3gG' % (torch.cuda.memory_cached() / 1E9 if torch.cuda.is_available() else 0)  # (GB)
-            s = ('%10s' * 2 + '%10.3g' * 6) % ('%g/%g' % (epoch, epochs - 1), mem, *mloss, len(targets), img_size)
+            s = ('%10s' * 2 + '%6.6g' * 6) % ('%g/%g' % (epoch, epochs - 1), mem, *mloss, len(targets), img_size)
             pbar.set_description(s)
 
             # Plot
@@ -363,7 +363,7 @@ def train(hyp):
 
             # Save backup every 10 epochs (optional)
             if epoch > 0 and epoch % 5 == 0:
-                torch.save(ckpt, weights + 'backup%g.pt' % epoch)
+                torch.save(ckpt, wdir + 'backup%g.pt' % epoch)
 
             #Save last, best and delete
             torch.save(ckpt, last)
@@ -397,7 +397,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, default=300)  # 500200 batches at bs 16, 117263 COCO images = 273 epochs
     parser.add_argument('--batch-size', type=int, default=8)  # effective bs = batch_size * accumulate = 16 * 4 = 64
-    parser.add_argument('--cfg', type=str, default='cfg/yolov3-spp3.cfg', help='*.cfg path')
+    parser.add_argument('--cfg', type=str, default='cfg/yolov3-spp.cfg', help='*.cfg path')
     parser.add_argument('--data', type=str, default='data/project.data', help='*.data path')
     parser.add_argument('--multi-scale', action='store_true', help='adjust (67%% - 150%%) img_size every 10 batches')
     parser.add_argument('--img-size', nargs='+', type=int, default=[608, 608], help='[min_train, max-train, test]')
