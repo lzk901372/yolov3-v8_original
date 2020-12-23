@@ -33,7 +33,7 @@ hyp = {'giou': 3.54,  # giou loss gain
        'lrf': 0.00005,  # final learning rate (with cos scheduler)
        'momentum': 0.937,  # SGD momentum
        'weight_decay': 0.0005,  # optimizer weight decay
-       'fl_gamma': 1.0,  # focal loss gamma (efficientDet default is gamma=1.5)
+       'fl_gamma': 1.0 * 0,  # focal loss gamma (efficientDet default is gamma=1.5)
        'hsv_h': 0.0138 * 0,  # image HSV-Hue augmentation (fraction)
        'hsv_s': 0.678 * 0,  # image HSV-Saturation augmentation (fraction)
        'hsv_v': 0.36 * 0,  # image HSV-Value augmentation (fraction)
@@ -247,7 +247,7 @@ def train(hyp):
             dataset.indices = random.choices(range(dataset.n), weights=image_weights, k=dataset.n)  # rand weighted idx
 
         mloss = torch.zeros(4).to(device)  # mean losses
-        print(('\n' + '%15s' * 8) % ('Epoch', 'gpu_mem', 'GIoU', 'obj', 'cls', 'total', 'targets', 'img_size'))
+        print(('\n' + '%10s' * 8) % ('Epoch', 'gpu_mem', 'GIoU', 'obj', 'cls', 'total', 'targets', 'img_size'))
         pbar = tqdm(enumerate(dataloader), total=nb)  # progress bar
         for i, (imgs, targets, paths, _) in pbar:  # batch -------------------------------------------------------------
             ni = i + nb * epoch  # number integrated batches (since train start)
@@ -301,7 +301,7 @@ def train(hyp):
             # Print
             mloss = (mloss * i + loss_items) / (i + 1)  # update mean losses
             mem = '%.3gG' % (torch.cuda.memory_cached() / 1E9 if torch.cuda.is_available() else 0)  # (GB)
-            s = ('%10s' * 2 + '%6.6g' * 6) % ('%g/%g' % (epoch, epochs - 1), mem, *mloss, len(targets), img_size)
+            s = ('%10s' * 2 + '%10.6g' * 6) % ('%g/%g' % (epoch, epochs - 1), mem, *mloss, len(targets), img_size)
             pbar.set_description(s)
 
             # Plot
@@ -395,24 +395,24 @@ def train(hyp):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--epochs', type=int, default=300)  # 500200 batches at bs 16, 117263 COCO images = 273 epochs
+    parser.add_argument('--epochs', type=int, default=400)  # 500200 batches at bs 16, 117263 COCO images = 273 epochs
     parser.add_argument('--batch-size', type=int, default=8)  # effective bs = batch_size * accumulate = 16 * 4 = 64
     parser.add_argument('--cfg', type=str, default='cfg/yolov3-spp.cfg', help='*.cfg path')
     parser.add_argument('--data', type=str, default='data/project.data', help='*.data path')
     parser.add_argument('--multi-scale', action='store_true', help='adjust (67%% - 150%%) img_size every 10 batches')
     parser.add_argument('--img-size', nargs='+', type=int, default=[608, 608], help='[min_train, max-train, test]')
     parser.add_argument('--rect', action='store_true', help='rectangular training')
-    parser.add_argument('--resume', default='false', help='resume training from last.pt')
-    parser.add_argument('--nosave', default='false', help='only save final checkpoint')
+    parser.add_argument('--resume', default=True, help='resume training from last.pt')
+    parser.add_argument('--nosave', default=False, help='only save final checkpoint')
     parser.add_argument('--notest', action='store_true', help='only test final epoch')
     parser.add_argument('--evolve', action='store_true', help='evolve hyperparameters')
     parser.add_argument('--bucket', type=str, default='', help='gsutil bucket')
     parser.add_argument('--cache-images', action='store_true', help='cache images for faster training')
-    parser.add_argument('--weights', type=str, default='weights/yolov3-spp-ultralytics.pt', help='initial weights path')
+    parser.add_argument('--weights', type=str, default='', help='initial weights path')
     parser.add_argument('--name', default='', help='renames results.txt to results_name.txt if supplied')
     parser.add_argument('--device', default='1', help='device id (i.e. 0 or 0,1 or cpu)')
     parser.add_argument('--adam', action='store_true', help='use adam optimizer')
-    parser.add_argument('--single-cls', default='true', help='train as single-class dataset')
+    parser.add_argument('--single-cls', default=True, help='train as single-class dataset')
     parser.add_argument('--freeze-layers', action='store_true', help='Freeze non-output layers')
     opt = parser.parse_args()
     opt.weights = last if opt.resume and not opt.weights else opt.weights
