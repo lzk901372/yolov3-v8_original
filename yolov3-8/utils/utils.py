@@ -1078,3 +1078,49 @@ def plot_results(start=0, stop=0, bucket='', id=()):  # from utils.utils import 
 
     ax[1].legend()
     fig.savefig('results.png', dpi=200)
+
+def get_single_gt(txt_path):
+    '''
+    Input: single labeled txt path
+    Output: boxes info of the input single labeled file
+    Usage: Similar to get_gt
+    '''
+    targets = []
+
+    with open(txt_path, 'r') as f:
+        targets0 = f.readlines()
+
+    for t in targets0:
+        t = t.split(' ')
+        target = {}
+
+        target['class'] = t[0]
+        target['x'] = float(t[1])
+        target['y'] = float(t[2])
+        target['w'] = float(t[3])
+        target['h'] = float(t[4])
+
+        targets.append(target)
+
+    return targets
+
+def draw_gt(img_path, img):
+    txt_gt_path = img_path.replace('images','labels').replace('bmp','txt').replace('png','txt').replace('jpg','txt')
+    if not os.path.exists(txt_gt_path):
+        return 0
+    targets = get_single_gt(txt_gt_path)
+
+    for target in targets:
+        height, width, _ = img.shape
+
+        tlx = target['x'] * width - target['w'] * width / 2
+        tly = target['y'] * height - target['h'] * height / 2
+        brx = tlx + target['w'] * width
+        bry = tly + target['h'] * height
+
+        blackmask = np.zeros(img.shape)
+        cv2.rectangle(blackmask, (int(tlx), int(tly)),
+                      (int(brx), int(bry)), (0, 255, 0), 1)
+        cv2.addWeighted(img, 1.0, blackmask, 0.5, 1, img, 0)
+
+    return len(targets)

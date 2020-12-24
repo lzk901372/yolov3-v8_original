@@ -1,11 +1,11 @@
 import os, shutil
 
 main_prefix = '/media/hdc/data3/lzk_ur_main/20201125_ODexps/yolov3_v8/yolov3_v8/data/shipdata/'
-input_dir_prefix = main_prefix + 'images/1327_frames/'
-output_dir_prefix_img = '/media/hdc/data3/lzk_ur_main/20201125_ODexps/yolov3_v8_original/yolov3-8/coco/images/test/'
-output_dir_prefix_lab = '/media/hdc/data3/lzk_ur_main/20201125_ODexps/yolov3_v8_original/yolov3-8/coco/labels/test/'
+input_dir_prefix = main_prefix + 'images/1344_frames/'
+output_dir_prefix_img = '/media/hdc/data3/lzk_ur_main/20201125_ODexps/yolov3_v8_original/yolov3-8/coco/images/valid/'
+output_dir_prefix_lab = '/media/hdc/data3/lzk_ur_main/20201125_ODexps/yolov3_v8_original/yolov3-8/coco/labels/valid/'
 
-with open(main_prefix + 'dataset_txt/1327_frames/test.txt', 'r') as file:
+with open(main_prefix + 'dataset_txt/1344_frames/val.txt', 'r') as file:
     images0 = file.readlines()
 
 images = [image.split('/')[-1].strip('\n') for image in images0]

@@ -45,6 +45,8 @@ class LoadImages:  # for inference
     def __init__(self, path, img_size=416):
         path = str(Path(path))  # os-agnostic
         files = []
+        self.img_names = []
+
         if os.path.isdir(path):
             files = sorted(glob.glob(os.path.join(path, '*.*')))
         elif os.path.isfile(path):
@@ -54,6 +56,7 @@ class LoadImages:  # for inference
         videos = [x for x in files if os.path.splitext(x)[-1].lower() in vid_formats]
         nI, nV = len(images), len(videos)
 
+        self.img_names = images
         self.img_size = img_size
         self.files = images + videos
         self.nF = nI + nV  # number of files

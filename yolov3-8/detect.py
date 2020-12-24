@@ -3,6 +3,8 @@ import argparse
 from models import *  # set ONNX_EXPORT in models.py
 from utils.datasets import *
 from utils.utils import *
+from utils.utils import draw_gt as DG
+import matplotlib.pyplot as plt
 
 
 def detect(save_img=False):
@@ -60,6 +62,7 @@ def detect(save_img=False):
         model.half()
 
     # Set Dataloader
+    img_names = []
     vid_path, vid_writer = None, None
     if webcam:
         view_img = True
@@ -68,6 +71,7 @@ def detect(save_img=False):
     else:
         save_img = True
         dataset = LoadImages(source, img_size=imgsz)
+        img_names = dataset.img_names
 
     # Get names and colors
     names = load_classes(opt.names)
@@ -77,6 +81,8 @@ def detect(save_img=False):
     t0 = time.time()
     img = torch.zeros((1, 3, imgsz, imgsz), device=device)  # init img
     _ = model(img.half() if half else img.float()) if device.type != 'cpu' else None  # run once
+
+    cnt = 0
     for path, img, im0s, vid_cap in dataset:
         img = torch.from_numpy(img).to(device)
         img = img.half() if half else img.float()  # uint8 to fp16/32
@@ -108,6 +114,14 @@ def detect(save_img=False):
             else:
                 p, s, im0 = path, '', im0s
 
+            # per_detect = {}
+
+            # Draw Ground Truth
+            num_gt = DG(img_names[cnt], im0)
+            cnt += 1
+            # per_detect['ground_truth_num'] = num_gt
+            # per_detect['detect_list'] = []
+
             save_path = str(Path(out) / Path(p).name)
             s += '%gx%g ' % img.shape[2:]  # print string
             gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  #  normalization gain whwh
@@ -129,16 +143,21 @@ def detect(save_img=False):
 
                     if save_img or view_img:  # Add bbox to image
                         label = '%s %.2f' % (names[int(cls)], conf)
-                        plot_one_box(xyxy, im0, label=label, color=colors[int(cls)])
+                        color_ = (0, 0, 255)
+                        plot_one_box(xyxy, im0, label=label, color=color_)#colors[int(cls)])
 
             # Print time (inference + NMS)
             print('%sDone. (%.3fs)' % (s, t2 - t1))
 
             # Stream results
             if view_img:
-                cv2.imshow(p, im0)
-                if cv2.waitKey(1) == ord('q'):  # q to quit
-                    raise StopIteration
+                # cv2.imshow(p, im0)
+                # if cv2.waitKey(1) == ord('q'):  # q to quit
+                #     raise StopIteration
+                plt.imshow(im0)
+                plt.title(p)
+                plt.show()
+                cv2.waitKey()
 
             # Save results (image with detections)
             if save_img:
@@ -175,7 +194,7 @@ if __name__ == '__main__':
     parser.add_argument('--conf-thres', type=float, default=0.5, help='object confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.5, help='IOU threshold for NMS')
     parser.add_argument('--fourcc', type=str, default='mp4v', help='output video codec (verify ffmpeg support)')
-    parser.add_argument('--half', action='store_true', help='half precision FP16 inference')
+    parser.add_argument('--half', default=True, help='half precision FP16 inference')
     parser.add_argument('--device', default='0', help='device id (i.e. 0 or 0,1) or cpu')
     parser.add_argument('--view-img', action='store_true', help='display results')
     parser.add_argument('--save-txt', default=True, help='save results to *.txt')

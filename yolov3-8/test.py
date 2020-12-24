@@ -241,7 +241,7 @@ if __name__ == '__main__':
     parser.add_argument('--save-json', action='store_true', help='save a cocoapi-compatible JSON results file')
     parser.add_argument('--task', default='test', help="'test', 'study', 'benchmark'")
     parser.add_argument('--device', default='0', help='device id (i.e. 0 or 0,1) or cpu')
-    parser.add_argument('--single-cls', default='true', help='train as single-class dataset')
+    parser.add_argument('--single-cls', default=True, help='train as single-class dataset')
     parser.add_argument('--augment', action='store_true', help='augmented inference')
     opt = parser.parse_args()
     opt.save_json = opt.save_json or any([x in opt.data for x in ['coco.data', 'coco2014.data', 'coco2017.data']])
